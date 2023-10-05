@@ -32,10 +32,12 @@ class Board:
     def check_win(self, row, col):
         # Check horizontal, vertical and diagonal lines for a win
         directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
-        for dx, dy in directions:
-            if self.count_stones(row, col, dx, dy) + self.count_stones(row, col, -dx, -dy) - 1 >= 5:
-                return True
-        return False
+        return any(
+            self.count_stones(row, col, dx, dy)
+            + self.count_stones(row, col, -dx, -dy)
+            >= 6
+            for dx, dy in directions
+        )
     def count_stones(self, row, col, dx, dy):
         count = 0
         while 0 <= row < self.rows and 0 <= col < self.cols and self.board[row][col] == self.current_player:

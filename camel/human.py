@@ -56,16 +56,14 @@ class Human:
             None
         """
         options = [message.content for message in messages]
-        options.append(self.input_button)
-        options.append(self.kill_button)
+        options.extend((self.input_button, self.kill_button))
         print_text_animated(
-            self.logger_color + "\n> Proposals from "
-            f"{messages[0].role_name} ({messages[0].role_type}). "
-            "Please choose an option:\n")
+            f"{self.logger_color}\n> Proposals from {messages[0].role_name} ({messages[0].role_type}). Please choose an option:\n"
+        )
         for index, option in enumerate(options):
             print_text_animated(
-                self.logger_color +
-                f"\x1b[3mOption {index + 1}:\n{option}\x1b[0m\n")
+                f"{self.logger_color}\x1b[3mOption {index + 1}:\n{option}\x1b[0m\n"
+            )
             self.options_dict[str(index + 1)] = option
 
     def get_input(self) -> str:
@@ -102,7 +100,7 @@ class Human:
                                               "Please enter your message: ")
             return meta_chat_message
         elif self.options_dict[human_input] == self.kill_button:
-            exit(self.logger_color + f"Killed by {self.name}.")
+            exit(f"{self.logger_color}Killed by {self.name}.")
         else:
             meta_chat_message.content = self.options_dict[human_input]
             return meta_chat_message

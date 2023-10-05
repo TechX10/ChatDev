@@ -147,13 +147,12 @@ class BaseMessage:
         Returns:
             Union[BaseMessage, Any]: The result of the multiplication.
         """
-        if isinstance(other, int):
-            multiplied_content = self.content.__mul__(other)
-            return self._create_new_instance(multiplied_content)
-        else:
+        if not isinstance(other, int):
             raise TypeError(
                 f"Unsupported operand type(s) for *: '{type(self)}' and "
                 f"'{type(other)}'")
+        multiplied_content = self.content.__mul__(other)
+        return self._create_new_instance(multiplied_content)
 
     def __len__(self) -> int:
         r"""Length operator override for :obj:`BaseMessage`.

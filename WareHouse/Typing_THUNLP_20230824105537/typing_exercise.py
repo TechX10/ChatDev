@@ -29,7 +29,7 @@ class TypingExercise:
         print(f"Speed: {speed} characters per minute")
         self.progress_tracker.record_performance(accuracy, speed)
     def calculate_accuracy(self, exercise, user_input):
-        correct_chars = sum([1 for c1, c2 in zip(exercise, user_input) if c1 == c2])
+        correct_chars = sum(1 for c1, c2 in zip(exercise, user_input) if c1 == c2)
         accuracy = (correct_chars / len(exercise)) * 100
         return round(accuracy, 2)
     def calculate_speed(self, user_input, elapsed_time):

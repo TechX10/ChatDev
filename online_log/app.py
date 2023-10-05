@@ -55,8 +55,7 @@ def send_message():
 def find_avatar_url(role):
     role = role.replace(" ", "%20")
     avatar_filename = f"avatars/{role}.png"
-    avatar_url = f"/static/{avatar_filename}"
-    return avatar_url
+    return f"/static/{avatar_filename}"
 
 
 if __name__ == "__main__":

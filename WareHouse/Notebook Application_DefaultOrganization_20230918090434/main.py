@@ -35,14 +35,16 @@ class NotebookApp:
         menu_bar.add_cascade(label="Format", menu=format_menu)
         self.root.config(menu=menu_bar)
     def open_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
-        if file_path:
+        if file_path := filedialog.askopenfilename(
+            filetypes=[("Text Files", "*.txt")]
+        ):
             with open(file_path, 'r') as file:
                 self.text_area.delete('1.0', 'end')
                 self.text_area.insert('1.0', file.read())
     def save_file(self):
-        file_path = filedialog.asksaveasfilename(defaultextension=".txt", filetypes=[("Text Files", "*.txt")])
-        if file_path:
+        if file_path := filedialog.asksaveasfilename(
+            defaultextension=".txt", filetypes=[("Text Files", "*.txt")]
+        ):
             with open(file_path, 'w') as file:
                 file.write(self.text_area.get('1.0', 'end-1c'))
     def exit_app(self):

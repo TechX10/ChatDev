@@ -76,11 +76,6 @@ class Game:
                 count += 1
             else:
                 break
-        if count >= 5:
-            return True
-        return False
+        return count >= 5
     def is_board_full(self):
-        for row in self.board:
-            if 0 in row:
-                return False
-        return True
+        return all(0 not in row for row in self.board)

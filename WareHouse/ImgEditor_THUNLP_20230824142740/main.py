@@ -52,16 +52,18 @@ class ImageEditor:
         self.canvas = tk.Canvas(self.root)
         self.canvas.pack(fill=tk.BOTH, expand=True)
     def open_image(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg;*.jpeg;*.png;*.gif")])
-        if file_path:
+        if file_path := filedialog.askopenfilename(
+            filetypes=[("Image Files", "*.jpg;*.jpeg;*.png;*.gif")]
+        ):
             self.current_image = Image.open(file_path)
             self.original_image = self.current_image.copy()
             self.display_image()
     def save_image(self):
         if self.current_image:
-            file_path = filedialog.asksaveasfilename(defaultextension=".jpg",
-                                                     filetypes=[("JPEG", "*.jpg"), ("PNG", "*.png"), ("GIF", "*.gif")])
-            if file_path:
+            if file_path := filedialog.asksaveasfilename(
+                defaultextension=".jpg",
+                filetypes=[("JPEG", "*.jpg"), ("PNG", "*.png"), ("GIF", "*.gif")],
+            ):
                 self.current_image.save(file_path)
     def display_image(self):
         if self.current_image:

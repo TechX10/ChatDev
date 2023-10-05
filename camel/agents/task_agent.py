@@ -100,10 +100,10 @@ class TaskSpecifyAgent(ChatAgent):
         if (specifier_response.msgs is None
                 or len(specifier_response.msgs) == 0):
             raise RuntimeError("Task specification failed.")
-        specified_task_msg = specifier_response.msgs[0]
-
         if specifier_response.terminated:
             raise RuntimeError("Task specification failed.")
+
+        specified_task_msg = specifier_response.msgs[0]
 
         return TextPrompt(specified_task_msg.content)
 

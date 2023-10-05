@@ -105,7 +105,7 @@ class EmbodiedAgent(ChatAgent):
             for explanation, code in zip(explanations, codes):
                 print_text_animated(self.logger_color +
                                     f"> Explanation:\n{explanation}")
-                print_text_animated(self.logger_color + f"> Code:\n{code}")
+                print_text_animated(f"{self.logger_color}> Code:\n{code}")
 
             if len(explanations) > len(codes):
                 print_text_animated(self.logger_color +

@@ -107,22 +107,22 @@ class CriticAgent(ChatAgent):
             critic_msg = critic_response.msgs[0]
             self.update_messages(critic_msg)
             if self.verbose:
-                print_text_animated(self.logger_color + "\n> Critic response: "
-                                    f"\x1b[3m{critic_msg.content}\x1b[0m\n")
+                print_text_animated(
+                    f"{self.logger_color}\n> Critic response: \x1b[3m{critic_msg.content}\x1b[0m\n"
+                )
             choice = self.parse_critic(critic_msg)
 
             if choice in self.options_dict:
                 return self.options_dict[choice]
-            else:
-                input_message = ChatMessage(
-                    role_name=input_message.role_name,
-                    role_type=input_message.role_type,
-                    meta_dict=input_message.meta_dict,
-                    role=input_message.role,
-                    content="> Invalid choice. Please choose again.\n" +
-                    msg_content,
-                )
-                i += 1
+            input_message = ChatMessage(
+                role_name=input_message.role_name,
+                role_type=input_message.role_type,
+                meta_dict=input_message.meta_dict,
+                role=input_message.role,
+                content="> Invalid choice. Please choose again.\n" +
+                msg_content,
+            )
+            i += 1
         warnings.warn("Critic failed to get a valid option. "
                       f"After {self.retry_attempts} attempts. "
                       "Returning a random option.")
@@ -139,8 +139,7 @@ class CriticAgent(ChatAgent):
             Optional[str]: The critic's choice as a string, or None if the
                 message could not be parsed.
         """
-        choice = str(get_first_int(critic_msg.content))
-        return choice
+        return str(get_first_int(critic_msg.content))
 
     def step(self, messages: Sequence[ChatMessage]) -> ChatMessage:
         r"""Performs one step of the conversation by flattening options to the

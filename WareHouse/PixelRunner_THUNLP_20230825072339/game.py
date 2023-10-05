@@ -84,5 +84,5 @@ class Game:
             self.powerups.remove(powerup)
     def draw_score(self):
         font = pygame.font.Font(None, 36)
-        score_text = font.render("Score: " + str(self.score), True, (255, 255, 255))
+        score_text = font.render(f"Score: {str(self.score)}", True, (255, 255, 255))
         self.screen.blit(score_text, (10, 10))

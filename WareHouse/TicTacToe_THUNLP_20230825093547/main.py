@@ -28,8 +28,7 @@ class TicTacToeGUI:
             if self.game.is_game_over():
                 self.show_winner()
     def show_winner(self):
-        winner = self.game.get_winner()
-        if winner:
+        if winner := self.game.get_winner():
             messagebox.showinfo("Game Over", f"Player {winner} wins!")
         else:
             messagebox.showinfo("Game Over", "It's a tie!")

@@ -230,8 +230,7 @@ class SingleTxtGenerator:
             ]
 
     def from_role_files(self) -> Generator[str, None, None]:
-        for data in self.data_list:
-            yield data
+        yield from self.data_list
 
 
 class CodeTaskPromptGenerator:

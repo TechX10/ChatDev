@@ -7,6 +7,4 @@ class PasswordStrengthChecker:
     def check_strength(self, password):
         if len(password) < 8:
             return "Weak"
-        if password.lower() in self.common_passwords:
-            return "Weak"
-        return "Strong"
+        return "Weak" if password.lower() in self.common_passwords else "Strong"

@@ -194,10 +194,7 @@ class CodeCompleteAll(ComposedPhase):
         return chat_env
 
     def break_cycle(self, phase_env) -> bool:
-        if phase_env['unimplemented_file'] == "":
-            return True
-        else:
-            return False
+        return phase_env['unimplemented_file'] == ""
 
 
 class CodeReview(ComposedPhase):
@@ -211,10 +208,10 @@ class CodeReview(ComposedPhase):
         return chat_env
 
     def break_cycle(self, phase_env) -> bool:
-        if "<INFO> Finished".lower() in phase_env['modification_conclusion'].lower():
-            return True
-        else:
-            return False
+        return (
+            "<INFO> Finished".lower()
+            in phase_env['modification_conclusion'].lower()
+        )
 
 
 class HumanAgentInteraction(ComposedPhase):
@@ -228,10 +225,11 @@ class HumanAgentInteraction(ComposedPhase):
         return chat_env
 
     def break_cycle(self, phase_env) -> bool:
-        if "<INFO> Finished".lower() in phase_env['modification_conclusion'].lower() or phase_env["comments"].lower() == "end":
-            return True
-        else:
-            return False
+        return (
+            "<INFO> Finished".lower()
+            in phase_env['modification_conclusion'].lower()
+            or phase_env["comments"].lower() == "end"
+        )
 
 
 class Test(ComposedPhase):
@@ -245,8 +243,7 @@ class Test(ComposedPhase):
         return chat_env
 
     def break_cycle(self, phase_env) -> bool:
-        if not phase_env['exist_bugs_flag']:
-            log_and_print_online(f"**[Test Info]**\n\nAI User (Software Test Engineer):\nTest Pass!\n")
-            return True
-        else:
+        if phase_env['exist_bugs_flag']:
             return False
+        log_and_print_online(f"**[Test Info]**\n\nAI User (Software Test Engineer):\nTest Pass!\n")
+        return True

@@ -25,16 +25,16 @@ class MarkdownToHTMLConverter:
         file_path = filedialog.askopenfilename(filetypes=[("Markdown Files", "*.md")])
         self.file_path.set(file_path)
     def convert_to_html(self):
-        markdown_file = self.file_path.get()
-        if markdown_file:
+        if markdown_file := self.file_path.get():
             parser = MarkdownParser()
             html_generator = HTMLGenerator()
             with open(markdown_file, 'r',encoding="utf-8") as file:
                 markdown_content = file.read()
             parsed_content = parser.parse(markdown_content)
             html_output = html_generator.generate_html(parsed_content)
-            save_path = filedialog.asksaveasfilename(defaultextension=".html", filetypes=[("HTML Files", "*.html")])
-            if save_path:
+            if save_path := filedialog.asksaveasfilename(
+                defaultextension=".html", filetypes=[("HTML Files", "*.html")]
+            ):
                 with open(save_path, 'w') as file:
                     file.write(html_output)
                 tk.messagebox.showinfo("Conversion Complete", "Markdown to HTML conversion successful!")

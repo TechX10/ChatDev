@@ -75,34 +75,28 @@ def get_info(dir, log_filepath):
         # print("num_utterance:", num_utterance)
 
         lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
-        sublines = [line for line in lines if line.startswith("prompt_tokens:")]
-        if len(sublines) > 0:
+        if sublines := [
+            line for line in lines if line.startswith("prompt_tokens:")
+        ]:
             nums = [int(line.split(": ")[-1]) for line in sublines]
             num_prompt_tokens = np.sum(nums)
-            # print("num_prompt_tokens:", num_prompt_tokens)
-
         lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
-        sublines = [line for line in lines if line.startswith("completion_tokens:")]
-        if len(sublines) > 0:
+        if sublines := [
+            line for line in lines if line.startswith("completion_tokens:")
+        ]:
             nums = [int(line.split(": ")[-1]) for line in sublines]
             num_completion_tokens = np.sum(nums)
-            # print("num_completion_tokens:", num_completion_tokens)
-
         lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
-        sublines = [line for line in lines if line.startswith("total_tokens:")]
-        if len(sublines) > 0:
+        if sublines := [
+            line for line in lines if line.startswith("total_tokens:")
+        ]:
             nums = [int(line.split(": ")[-1]) for line in sublines]
             num_total_tokens = np.sum(nums)
-            # print("num_total_tokens:", num_total_tokens)
-
         lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
 
         lines = open(log_filepath, "r", encoding="utf8").read().split("\n")
-        num_reflection = 0
-        for line in lines:
-            if "on : Reflection" in line:
-                num_reflection += 1
-        # print("num_reflection:", num_reflection)
+        num_reflection = sum(1 for line in lines if "on : Reflection" in line)
+            # print("num_reflection:", num_reflection)
 
     cost = 0.0
     if num_png_files != -1:
@@ -112,21 +106,18 @@ def get_info(dir, log_filepath):
     if num_completion_tokens != -1:
         cost += num_completion_tokens * 0.004 / 1000.0
 
-    # info = f"🕑duration={duration}s 💰cost=${cost} 🔨version_updates={version_updates} 📃num_code_files={num_code_files} 🏞num_png_files={num_png_files} 📚num_doc_files={num_doc_files} 📃code_lines={code_lines} 📋env_lines={env_lines} 📒manual_lines={manual_lines} 🗣num_utterances={num_utterance} 🤔num_self_reflections={num_reflection} ❓num_prompt_tokens={num_prompt_tokens} ❗num_completion_tokens={num_completion_tokens} ⁉️num_total_tokens={num_total_tokens}"
-
-    info = "\n\n💰**cost**=${:.6f}\n\n🔨**version_updates**={}\n\n📃**num_code_files**={}\n\n🏞**num_png_files**={}\n\n📚**num_doc_files**={}\n\n📃**code_lines**={}\n\n📋**env_lines**={}\n\n📒**manual_lines**={}\n\n🗣**num_utterances**={}\n\n🤔**num_self_reflections**={}\n\n❓**num_prompt_tokens**={}\n\n❗**num_completion_tokens**={}\n\n🌟**num_total_tokens**={}" \
-        .format(cost,
-                version_updates,
-                num_code_files,
-                num_png_files,
-                num_doc_files,
-                code_lines,
-                env_lines,
-                manual_lines,
-                num_utterance,
-                num_reflection,
-                num_prompt_tokens,
-                num_completion_tokens,
-                num_total_tokens)
-
-    return info
+    return "\n\n💰**cost**=${:.6f}\n\n🔨**version_updates**={}\n\n📃**num_code_files**={}\n\n🏞**num_png_files**={}\n\n📚**num_doc_files**={}\n\n📃**code_lines**={}\n\n📋**env_lines**={}\n\n📒**manual_lines**={}\n\n🗣**num_utterances**={}\n\n🤔**num_self_reflections**={}\n\n❓**num_prompt_tokens**={}\n\n❗**num_completion_tokens**={}\n\n🌟**num_total_tokens**={}".format(
+        cost,
+        version_updates,
+        num_code_files,
+        num_png_files,
+        num_doc_files,
+        code_lines,
+        env_lines,
+        manual_lines,
+        num_utterance,
+        num_reflection,
+        num_prompt_tokens,
+        num_completion_tokens,
+        num_total_tokens,
+    )
