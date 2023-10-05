@@ -14,8 +14,8 @@ class Documents():
             if parse:
                 regex = r"```\n(.*?)```"
                 matches = re.finditer(regex, self.generated_content, re.DOTALL)
+                filename = "requirements.txt"
                 for match in matches:
-                    filename = "requirements.txt"
                     doc = match.group(1)
                     self.docbooks[filename] = doc
             else:
@@ -25,8 +25,10 @@ class Documents():
         new_docs = Documents(generated_content, parse, predifined_filename)
         for key in new_docs.docbooks.keys():
             if key not in self.docbooks.keys() or self.docbooks[key] != new_docs.docbooks[key]:
-                print("{} updated.".format(key))
-                print(Fore.WHITE + "------Old:\n{}\n------New:\n{}".format(self.docbooks[key] if key in self.docbooks.keys() else "# None", new_docs.docbooks[key]))
+                print(f"{key} updated.")
+                print(
+                    f'{Fore.WHITE}------Old:\n{self.docbooks[key] if key in self.docbooks.keys() else "# None"}\n------New:\n{new_docs.docbooks[key]}'
+                )
                 self.docbooks[key] = new_docs.docbooks[key]
 
 
@@ -34,14 +36,14 @@ class Documents():
         directory = self.directory
         if not os.path.exists(directory):
             os.mkdir(directory)
-            print("{} Created.".format(directory))
+            print(f"{directory} Created.")
         for filename in self.docbooks.keys():
             with open(os.path.join(directory, filename), "w", encoding="utf-8") as writer:
                 writer.write(self.docbooks[filename])
                 print(os.path.join(directory, filename), "Writed")
 
     def _get_docs(self):
-        content = ""
-        for filename in self.docbooks.keys():
-            content += "{}\n```\n{}\n```\n\n".format(filename, self.docbooks[filename])
-        return content
+        return "".join(
+            f"{filename}\n```\n{self.docbooks[filename]}\n```\n\n"
+            for filename in self.docbooks.keys()
+        )

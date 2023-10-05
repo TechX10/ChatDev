@@ -26,10 +26,10 @@ class Timer:
             elapsed = self.elapsed_time + (time.time() - self.start_time)
         else:
             elapsed = self.elapsed_time
-        hours = int(elapsed // 3600)
         minutes = int((elapsed % 3600) // 60)
         seconds = int(elapsed % 60)
         if format_str == "HH:MM:SS":
+            hours = int(elapsed // 3600)
             return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
         elif format_str == "MM:SS:MS":
             milliseconds = int((elapsed % 1) * 1000)

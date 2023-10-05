@@ -130,14 +130,20 @@ class Phase(ABC):
             # the first interaction is logged in role_play_session.init_chat
             assistant_response, user_response = role_play_session.step(input_user_msg, chat_turn_limit == 1)
 
-            conversation_meta = "**" + assistant_role_name + "<->" + user_role_name + " on : " + str(
-                phase_name) + ", turn " + str(i) + "**\n\n"
+            conversation_meta = (
+                f"**{assistant_role_name}<->{user_role_name} on : {phase_name}, turn {str(i)}"
+                + "**\n\n"
+            )
 
             # TODO: max_tokens_exceeded errors here
             if isinstance(assistant_response.msg, ChatMessage):
                 # we log the second interaction here
-                log_and_print_online(role_play_session.assistant_agent.role_name,
-                                     conversation_meta + "[" + role_play_session.user_agent.system_message.content + "]\n\n" + assistant_response.msg.content)
+                log_and_print_online(
+                    role_play_session.assistant_agent.role_name,
+                    f"{conversation_meta}[{role_play_session.user_agent.system_message.content}"
+                    + "]\n\n"
+                    + assistant_response.msg.content,
+                )
                 if role_play_session.assistant_agent.info:
                     seminar_conclusion = assistant_response.msg.content
                     break
@@ -146,8 +152,12 @@ class Phase(ABC):
 
             if isinstance(user_response.msg, ChatMessage):
                 # here is the result of the second interaction, which may be used to start the next chat turn
-                log_and_print_online(role_play_session.user_agent.role_name,
-                                     conversation_meta + "[" + role_play_session.assistant_agent.system_message.content + "]\n\n" + user_response.msg.content)
+                log_and_print_online(
+                    role_play_session.user_agent.role_name,
+                    f"{conversation_meta}[{role_play_session.assistant_agent.system_message.content}"
+                    + "]\n\n"
+                    + user_response.msg.content,
+                )
                 if role_play_session.user_agent.info:
                     seminar_conclusion = user_response.msg.content
                     break
@@ -163,20 +173,16 @@ class Phase(ABC):
         # conduct self reflection
         if need_reflect:
             if seminar_conclusion in [None, ""]:
-                seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session, phase_name,
-                                                                      chat_env)
+                seminar_conclusion = f"<INFO> {self.self_reflection(task_prompt, role_play_session, phase_name, chat_env)}"
             if "recruiting" in phase_name:
                 if "Yes".lower() not in seminar_conclusion.lower() and "No".lower() not in seminar_conclusion.lower():
-                    seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session,
-                                                                          phase_name,
-                                                                          chat_env)
+                    seminar_conclusion = f"<INFO> {self.self_reflection(task_prompt, role_play_session, phase_name, chat_env)}"
             elif seminar_conclusion in [None, ""]:
-                seminar_conclusion = "<INFO> " + self.self_reflection(task_prompt, role_play_session, phase_name,
-                                                                      chat_env)
+                seminar_conclusion = f"<INFO> {self.self_reflection(task_prompt, role_play_session, phase_name, chat_env)}"
         else:
             seminar_conclusion = assistant_response.msg.content
 
-        log_and_print_online("**[Seminar Conclusion]**:\n\n {}".format(seminar_conclusion))
+        log_and_print_online(f"**[Seminar Conclusion]**:\n\n {seminar_conclusion}")
         seminar_conclusion = seminar_conclusion.split("<INFO>")[-1]
         return seminar_conclusion
 
@@ -217,7 +223,7 @@ class Phase(ABC):
         # Reflections actually is a special phase between CEO and counselor
         # They read the whole chatting history of this phase and give refined conclusion of this phase
         reflected_content = \
-            self.chatting(chat_env=chat_env,
+                self.chatting(chat_env=chat_env,
                           task_prompt=task_prompt,
                           assistant_role_name="Chief Executive Officer",
                           user_role_name="Counselor",
@@ -230,12 +236,9 @@ class Phase(ABC):
                           chat_turn_limit=1,
                           model_type=self.model_type)
 
-        if "recruiting" in phase_name:
-            if "Yes".lower() in reflected_content.lower():
-                return "Yes"
-            return "No"
-        else:
+        if "recruiting" not in phase_name:
             return reflected_content
+        return "Yes" if "Yes".lower() in reflected_content.lower() else "No"
 
     @abstractmethod
     def update_phase_env(self, chat_env):
@@ -356,7 +359,8 @@ class Coding(Phase):
             raise ValueError("No Valid Codes.")
         chat_env.rewrite_codes("Finish Coding")
         log_and_print_online(
-            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+            f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+        )
         return chat_env
 
 
@@ -372,7 +376,8 @@ class ArtDesign(Phase):
     def update_chat_env(self, chat_env) -> ChatEnv:
         chat_env.proposed_images = chat_env.get_proposed_images_from_message(self.seminar_conclusion)
         log_and_print_online(
-            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+            f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+        )
         return chat_env
 
 
@@ -393,7 +398,8 @@ class ArtIntegration(Phase):
         chat_env.rewrite_codes("Finish Art Integration")
         # chat_env.generate_images_from_codes()
         log_and_print_online(
-            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+            f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+        )
         return chat_env
 
 
@@ -412,7 +418,11 @@ class CodeComplete(Phase):
         for filename in self.phase_env['pyfiles']:
             code_content = open(os.path.join(chat_env.env_dict['directory'], filename)).read()
             lines = [line.strip() for line in code_content.split("\n") if line.strip() == "pass"]
-            if len(lines) > 0 and self.phase_env['num_tried'][filename] < self.phase_env['max_num_implement']:
+            if (
+                lines
+                and self.phase_env['num_tried'][filename]
+                < self.phase_env['max_num_implement']
+            ):
                 unimplemented_file = filename
                 break
         self.phase_env['num_tried'][unimplemented_file] += 1
@@ -424,7 +434,8 @@ class CodeComplete(Phase):
             raise ValueError("No Valid Codes.")
         chat_env.rewrite_codes("Code Complete #" + str(self.phase_env["cycle_index"]) + " Finished")
         log_and_print_online(
-            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+            f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+        )
         return chat_env
 
 
@@ -463,7 +474,8 @@ class CodeReviewModification(Phase):
             chat_env.update_codes(self.seminar_conclusion)
             chat_env.rewrite_codes("Review #" + str(self.phase_env["cycle_index"]) + " Finished")
             log_and_print_online(
-                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+                f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+            )
         self.phase_env['modification_conclusion'] = self.seminar_conclusion
         return chat_env
 
@@ -484,7 +496,8 @@ class CodeReviewHuman(Phase):
             chat_env.update_codes(self.seminar_conclusion)
             chat_env.rewrite_codes("Human Review #" + str(self.phase_env["cycle_index"]) + " Finished")
             log_and_print_online(
-                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+                f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+            )
         return chat_env
 
     def execute(self, chat_env, chat_turn_limit, need_reflect) -> ChatEnv:
@@ -501,12 +514,13 @@ class CodeReviewHuman(Phase):
         provided_comments = input(">>> ")
         self.phase_env["comments"] = provided_comments
         log_and_print_online(
-            f"**[User Provided Comments]**\n\n In the #{self.phase_env['cycle_index']} of total {self.phase_env['cycle_num']} comments: \n\n" + provided_comments)
+            f"**[User Provided Comments]**\n\n In the #{self.phase_env['cycle_index']} of total {self.phase_env['cycle_num']} comments: \n\n{provided_comments}"
+        )
         if provided_comments.lower() == "end":
             return chat_env
 
         self.seminar_conclusion = \
-            self.chatting(chat_env=chat_env,
+                self.chatting(chat_env=chat_env,
                           task_prompt=chat_env.env_dict['task_prompt'],
                           need_reflect=need_reflect,
                           assistant_role_name=self.assistant_role_name,
@@ -536,7 +550,7 @@ class TestErrorSummary(Phase):
                                "codes": chat_env.get_codes(),
                                "test_reports": test_reports,
                                "exist_bugs_flag": exist_bugs_flag})
-        log_and_print_online("**[Test Reports]**:\n\n{}".format(test_reports))
+        log_and_print_online(f"**[Test Reports]**:\n\n{test_reports}")
 
     def update_chat_env(self, chat_env) -> ChatEnv:
         chat_env.env_dict['error_summary'] = self.seminar_conclusion
@@ -553,12 +567,12 @@ class TestErrorSummary(Phase):
             pip_install_content = ""
             for match in re.finditer(r"No module named '(\S+)'", self.phase_env['test_reports'], re.DOTALL):
                 module = match.group(1)
-                pip_install_content += "{}\n```{}\n{}\n```\n".format("cmd", "bash", f"pip install {module}")
+                pip_install_content += f"cmd\n```bash\npip install {module}\n```\n"
                 log_and_print_online(f"Programmer resolve ModuleNotFoundError by:\n{pip_install_content}\n")
             self.seminar_conclusion = "nothing need to do"
         else:
             self.seminar_conclusion = \
-                self.chatting(chat_env=chat_env,
+                    self.chatting(chat_env=chat_env,
                               task_prompt=chat_env.env_dict['task_prompt'],
                               need_reflect=need_reflect,
                               assistant_role_name=self.assistant_role_name,
@@ -592,7 +606,8 @@ class TestModification(Phase):
             chat_env.update_codes(self.seminar_conclusion)
             chat_env.rewrite_codes("Test #" + str(self.phase_env["cycle_index"]) + " Finished")
             log_and_print_online(
-                "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+                f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+            )
         return chat_env
 
 
@@ -611,7 +626,8 @@ class EnvironmentDoc(Phase):
         chat_env._update_requirements(self.seminar_conclusion)
         chat_env.rewrite_requirements()
         log_and_print_online(
-            "**[Software Info]**:\n\n {}".format(get_info(chat_env.env_dict['directory'], self.log_filepath)))
+            f"**[Software Info]**:\n\n {get_info(chat_env.env_dict['directory'], self.log_filepath)}"
+        )
         return chat_env
 
 

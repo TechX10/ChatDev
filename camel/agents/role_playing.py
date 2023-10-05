@@ -235,7 +235,9 @@ class RolePlaying:
             user_msg: ChatMessage,
             assistant_only: bool,
     ) -> Tuple[ChatAgentResponse, ChatAgentResponse]:
-        assert isinstance(user_msg, ChatMessage), print("broken user_msg: " + str(user_msg))
+        assert isinstance(user_msg, ChatMessage), print(
+            f"broken user_msg: {str(user_msg)}"
+        )
 
         # print("assistant...")
         user_msg_rst = user_msg.set_user_role_at_backend()

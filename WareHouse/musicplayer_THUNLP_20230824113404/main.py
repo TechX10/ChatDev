@@ -80,7 +80,7 @@ class MusicPlayer:
             self.metadata.set('Title: ' + audio["TIT2"].text[0] + ', Artist: ' + audio["TPE1"].text[0] + ', Duration: ' +
                               str(audio.info.length))
         except Exception as e:
-            self.metadata.set("An error occurred: " + str(e))
+            self.metadata.set(f"An error occurred: {str(e)}")
     def stop_music(self):
         self.status.set("-Stopped")
         pygame.mixer.music.stop()

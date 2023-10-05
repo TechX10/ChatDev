@@ -53,13 +53,13 @@ class Game:
                 if self.current_card.value == card.value:
                     self.current_card = None
                     self.num_matches += 1
-                    self.matches_label.config(text="Matches: " + str(self.num_matches))
+                    self.matches_label.config(text=f"Matches: {self.num_matches}")
                     if self.num_matches == len(self.cards) // 2:
                         self.show_game_over_message()
                 else:
                     self.root.after(1000, lambda: self.hide_cards(card))
                 self.num_moves += 1
-                self.moves_label.config(text="Moves: " + str(self.num_moves))
+                self.moves_label.config(text=f"Moves: {self.num_moves}")
     def hide_cards(self, card):
         # Hide the selected cards
         self.current_card.hide()

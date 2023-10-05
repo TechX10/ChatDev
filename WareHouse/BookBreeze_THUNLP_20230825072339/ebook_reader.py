@@ -41,19 +41,17 @@ class EbookReader:
         self.remove_bookmark_button.pack()
     def open_book(self):
         filetypes = [("PDF Files", "*.pdf"), ("EPUB Files", "*.epub"), ("MOBI Files", "*.mobi")]
-        filepath = filedialog.askopenfilename(filetypes=filetypes)
-        if filepath:
+        if filepath := filedialog.askopenfilename(filetypes=filetypes):
             self.current_book = filepath
             self.book_display.delete(1.0, tk.END)
             self.book_display.insert(tk.END, f"Opening book: {filepath}")
             if filepath.endswith(".pdf"):
-                pdf_file = open(filepath, "rb")
-                pdf_reader = PyPDF2.PdfReader(pdf_file)
-                num_pages = len(pdf_reader.pages)
-                for page_num in range(num_pages):
-                    page = pdf_reader.pages[page_num]
-                    self.book_display.insert(tk.END, page.extract_text())
-                pdf_file.close()
+                with open(filepath, "rb") as pdf_file:
+                    pdf_reader = PyPDF2.PdfReader(pdf_file)
+                    num_pages = len(pdf_reader.pages)
+                    for page_num in range(num_pages):
+                        page = pdf_reader.pages[page_num]
+                        self.book_display.insert(tk.END, page.extract_text())
             elif filepath.endswith(".epub"):
                 book = epub.read_epub(filepath)
                 for item in book.get_items():
@@ -71,8 +69,7 @@ class EbookReader:
             self.bookmarks.append(bookmark)
             self.bookmarks_listbox.insert(tk.END, f"Bookmark {len(self.bookmarks)}")
     def remove_bookmark(self):
-        selected_index = self.bookmarks_listbox.curselection()
-        if selected_index:
+        if selected_index := self.bookmarks_listbox.curselection():
             bookmark_index = selected_index[0]
             self.bookmarks.pop(bookmark_index)
             self.bookmarks_listbox.delete(selected_index)

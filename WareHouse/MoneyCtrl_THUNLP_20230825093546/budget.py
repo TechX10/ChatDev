@@ -12,13 +12,9 @@ class Budget:
         # Add expense to the list
         self.expenses.append({"amount": amount, "description": description})
     def calculate_total_income(self):
-        # Calculate the total income
-        total_income = sum(income["amount"] for income in self.income)
-        return total_income
+        return sum(income["amount"] for income in self.income)
     def calculate_total_expenses(self):
-        # Calculate the total expenses
-        total_expenses = sum(expense["amount"] for expense in self.expenses)
-        return total_expenses
+        return sum(expense["amount"] for expense in self.expenses)
     def generate_report(self):
         # Generate a report with income, expenses, and analytics
         total_income = self.calculate_total_income()

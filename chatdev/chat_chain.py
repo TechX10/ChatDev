@@ -173,8 +173,10 @@ class ChatChain:
         root = os.path.dirname(filepath)
         # directory = root + "/WareHouse/"
         directory = os.path.join(root, "WareHouse")
-        log_filepath = os.path.join(directory,
-                                    "{}.log".format("_".join([self.project_name, self.org_name, start_time])))
+        log_filepath = os.path.join(
+            directory,
+            f'{"_".join([self.project_name, self.org_name, start_time])}.log',
+        )
         return start_time, log_filepath
 
     def pre_processing(self):
@@ -192,7 +194,7 @@ class ChatChain:
                 # logs with error trials are left in WareHouse/
                 if os.path.isfile(file_path) and not filename.endswith(".py") and not filename.endswith(".log"):
                     os.remove(file_path)
-                    print("{} Removed.".format(file_path))
+                    print(f"{file_path} Removed.")
 
         software_path = os.path.join(directory, "_".join([self.project_name, self.org_name, self.start_time]))
         self.chat_env.set_directory(software_path)
@@ -203,22 +205,22 @@ class ChatChain:
         shutil.copy(self.config_role_path, software_path)
 
         # write task prompt to software path
-        with open(os.path.join(software_path, self.project_name + ".prompt"), "w") as f:
+        with open(os.path.join(software_path, f"{self.project_name}.prompt"), "w") as f:
             f.write(self.task_prompt_raw)
 
         preprocess_msg = "**[Preprocessing]**\n\n"
         chat_gpt_config = ChatGPTConfig()
 
-        preprocess_msg += "**ChatDev Starts** ({})\n\n".format(self.start_time)
-        preprocess_msg += "**Timestamp**: {}\n\n".format(self.start_time)
-        preprocess_msg += "**config_path**: {}\n\n".format(self.config_path)
-        preprocess_msg += "**config_phase_path**: {}\n\n".format(self.config_phase_path)
-        preprocess_msg += "**config_role_path**: {}\n\n".format(self.config_role_path)
-        preprocess_msg += "**task_prompt**: {}\n\n".format(self.task_prompt_raw)
-        preprocess_msg += "**project_name**: {}\n\n".format(self.project_name)
-        preprocess_msg += "**Log File**: {}\n\n".format(self.log_filepath)
-        preprocess_msg += "**ChatDevConfig**:\n{}\n\n".format(self.chat_env.config.__str__())
-        preprocess_msg += "**ChatGPTConfig**:\n{}\n\n".format(chat_gpt_config)
+        preprocess_msg += f"**ChatDev Starts** ({self.start_time})\n\n"
+        preprocess_msg += f"**Timestamp**: {self.start_time}\n\n"
+        preprocess_msg += f"**config_path**: {self.config_path}\n\n"
+        preprocess_msg += f"**config_phase_path**: {self.config_phase_path}\n\n"
+        preprocess_msg += f"**config_role_path**: {self.config_role_path}\n\n"
+        preprocess_msg += f"**task_prompt**: {self.task_prompt_raw}\n\n"
+        preprocess_msg += f"**project_name**: {self.project_name}\n\n"
+        preprocess_msg += f"**Log File**: {self.log_filepath}\n\n"
+        preprocess_msg += f"**ChatDevConfig**:\n{self.chat_env.config.__str__()}\n\n"
+        preprocess_msg += f"**ChatGPTConfig**:\n{chat_gpt_config}\n\n"
         log_and_print_online(preprocess_msg)
 
         # init task prompt
@@ -242,40 +244,41 @@ class ChatChain:
             git_online_log = "**[Git Information]**\n\n"
 
             self.chat_env.codes.version += 1
-            os.system("cd {}; git add .".format(self.chat_env.env_dict["directory"]))
-            git_online_log += "cd {}; git add .\n".format(self.chat_env.env_dict["directory"])
-            os.system("cd {}; git commit -m \"v{} Final Version\"".format(self.chat_env.env_dict["directory"], self.chat_env.codes.version))
-            git_online_log += "cd {}; git commit -m \"v{} Final Version\"\n".format(self.chat_env.env_dict["directory"], self.chat_env.codes.version)
+            os.system(f'cd {self.chat_env.env_dict["directory"]}; git add .')
+            git_online_log += f'cd {self.chat_env.env_dict["directory"]}; git add .\n'
+            os.system(
+                f'cd {self.chat_env.env_dict["directory"]}; git commit -m \"v{self.chat_env.codes.version} Final Version\"'
+            )
+            git_online_log += f'cd {self.chat_env.env_dict["directory"]}; git commit -m \"v{self.chat_env.codes.version} Final Version\"\n'
             log_and_print_online(git_online_log)
 
             git_info = "**[Git Log]**\n\n"
             import subprocess
 
             # 执行git log命令
-            command = "cd {}; git log".format(self.chat_env.env_dict["directory"])
+            command = f'cd {self.chat_env.env_dict["directory"]}; git log'
             completed_process = subprocess.run(command, shell=True, text=True, stdout=subprocess.PIPE)
 
             if completed_process.returncode == 0:
                 log_output = completed_process.stdout
             else:
-                log_output = "Error when executing " + command
+                log_output = f"Error when executing {command}"
 
             git_info += log_output
             log_and_print_online(git_info)
 
-        post_info = "**[Post Info]**\n\n"
         now_time = now()
         time_format = "%Y%m%d%H%M%S"
         datetime1 = datetime.strptime(self.start_time, time_format)
         datetime2 = datetime.strptime(now_time, time_format)
         duration = (datetime2 - datetime1).total_seconds()
 
-        post_info += "Software Info: {}".format(
-            get_info(self.chat_env.env_dict['directory'], self.log_filepath) + "\n\n🕑**duration**={:.2f}s\n\n".format(
-                duration))
-
-        post_info += "ChatDev Starts ({})".format(self.start_time) + "\n\n"
-        post_info += "ChatDev Ends ({})".format(now_time) + "\n\n"
+        post_info = "**[Post Info]**\n\n" + "Software Info: {}".format(
+            get_info(self.chat_env.env_dict['directory'], self.log_filepath)
+            + "\n\n🕑**duration**={:.2f}s\n\n".format(duration)
+        )
+        post_info += f"ChatDev Starts ({self.start_time})" + "\n\n"
+        post_info += f"ChatDev Ends ({now_time})" + "\n\n"
 
         if self.chat_env.config.clear_structure:
             directory = self.chat_env.env_dict['directory']
@@ -283,16 +286,21 @@ class ChatChain:
                 file_path = os.path.join(directory, filename)
                 if os.path.isdir(file_path) and file_path.endswith("__pycache__"):
                     shutil.rmtree(file_path, ignore_errors=True)
-                    post_info += "{} Removed.".format(file_path) + "\n\n"
+                    post_info += f"{file_path} Removed." + "\n\n"
 
         log_and_print_online(post_info)
 
         logging.shutdown()
         time.sleep(1)
 
-        shutil.move(self.log_filepath,
-                    os.path.join(root + "/WareHouse", "_".join([self.project_name, self.org_name, self.start_time]),
-                                 os.path.basename(self.log_filepath)))
+        shutil.move(
+            self.log_filepath,
+            os.path.join(
+                f"{root}/WareHouse",
+                "_".join([self.project_name, self.org_name, self.start_time]),
+                os.path.basename(self.log_filepath),
+            ),
+        )
 
     # @staticmethod
     def self_task_improve(self, task_prompt):
@@ -332,6 +340,6 @@ then you should return a message in a format like \"<INFO> revised_version_of_th
         revised_task_prompt = assistant_response.msg.content.split("<INFO>")[-1].lower().strip()
         log_and_print_online(role_play_session.assistant_agent.role_name, assistant_response.msg.content)
         log_and_print_online(
-            "**[Task Prompt Self Improvement]**\n**Original Task Prompt**: {}\n**Improved Task Prompt**: {}".format(
-                task_prompt, revised_task_prompt))
+            f"**[Task Prompt Self Improvement]**\n**Original Task Prompt**: {task_prompt}\n**Improved Task Prompt**: {revised_task_prompt}"
+        )
         return revised_task_prompt

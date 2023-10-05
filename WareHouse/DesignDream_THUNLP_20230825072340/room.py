@@ -33,7 +33,7 @@ class Room:
         # Serialize the room object and write to a file
         with open("design.txt", "w") as file:
             for furniture in self.furniture:
-                file.write(furniture.type + "," + str(furniture.x) + "," + str(furniture.y) + "\n")
+                file.write(f"{furniture.type},{str(furniture.x)},{str(furniture.y)}" + "\n")
     def load_design(self):
         # Load a saved room design from a file
         # Read the serialized room object from a file and deserialize

@@ -1,6 +1,6 @@
 class Roster():
     def __init__(self) -> None:
-        self.agents = list()
+        self.agents = []
 
     def _recruit(self, agent_name: str):
         self.agents.append(agent_name)
@@ -10,11 +10,9 @@ class Roster():
         names = [name.lower().strip() for name in names]
         names = [name.replace(" ", "").replace("_", "") for name in names]
         agent_name = names[-1]
-        if agent_name in names[:-1]:
-            return True
-        return False
+        return agent_name in names[:-1]
 
     def _print_employees(self):
         names = self.agents
         names = [name.lower().strip() for name in names]
-        print("Employees: {}".format(names))
+        print(f"Employees: {names}")

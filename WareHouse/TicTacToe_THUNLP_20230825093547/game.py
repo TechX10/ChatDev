@@ -21,17 +21,10 @@ class Game:
                 return True
         if self.board[0][0] == self.board[1][1] == self.board[2][2] == player:
             return True
-        if self.board[0][2] == self.board[1][1] == self.board[2][0] == player:
-            return True
-        return False
+        return self.board[0][2] == self.board[1][1] == self.board[2][0] == player
     def is_board_full(self):
-        for row in self.board:
-            if '' in row:
-                return False
-        return True
+        return all('' not in row for row in self.board)
     def get_winner(self):
         if self.is_winner('X'):
             return 'X'
-        if self.is_winner('O'):
-            return 'O'
-        return None
+        return 'O' if self.is_winner('O') else None

@@ -15,8 +15,9 @@ class VideoPlayerApp:
         self.play_button = tk.Button(self.root, text="Play", command=self.play_video)
         self.play_button.pack()
     def open_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("MP4 files", "*.mp4")])
-        if file_path:
+        if file_path := filedialog.askopenfilename(
+            filetypes=[("MP4 files", "*.mp4")]
+        ):
             self.video_player.load_video(file_path)
             messagebox.showinfo("Success", "Video loaded successfully!")
     def play_video(self):

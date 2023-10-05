@@ -71,9 +71,8 @@ class OpenAIModel(ModelBackend):
                                                 **self.model_config_dict)
 
         log_and_print_online(
-            "**[OpenAI_Usage_Info Receive]**\nprompt_tokens: {}\ncompletion_tokens: {}\ntotal_tokens: {}\n".format(
-                response["usage"]["prompt_tokens"], response["usage"]["completion_tokens"],
-                response["usage"]["total_tokens"]))
+            f'**[OpenAI_Usage_Info Receive]**\nprompt_tokens: {response["usage"]["prompt_tokens"]}\ncompletion_tokens: {response["usage"]["completion_tokens"]}\ntotal_tokens: {response["usage"]["total_tokens"]}\n'
+        )
         if not isinstance(response, Dict):
             raise RuntimeError("Unexpected return from OpenAI API")
         return response
@@ -122,6 +121,4 @@ class ModelFactory:
         if model_type is None:
             model_type = default_model_type
 
-        # log_and_print_online("Model Type: {}".format(model_type))
-        inst = model_class(model_type, model_config_dict)
-        return inst
+        return model_class(model_type, model_config_dict)

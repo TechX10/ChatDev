@@ -24,10 +24,9 @@ class ChatEnvConfig:
         self.git_management = git_management
 
     def __str__(self):
-        string = ""
-        string += "ChatEnvConfig.clear_structure: {}\n".format(self.clear_structure)
-        string += "ChatEnvConfig.git_management: {}\n".format(self.git_management)
-        string += "ChatEnvConfig.gui_design: {}\n".format(self.gui_design)
+        string = f"ChatEnvConfig.clear_structure: {self.clear_structure}\n"
+        string += f"ChatEnvConfig.git_management: {self.git_management}\n"
+        string += f"ChatEnvConfig.gui_design: {self.gui_design}\n"
         return string
 
 
@@ -56,8 +55,8 @@ class ChatEnv:
         if "ModuleNotFoundError" in test_reports:
             for match in re.finditer(r"No module named '(\S+)'", test_reports, re.DOTALL):
                 module = match.group(1)
-                subprocess.Popen("pip install {}".format(module), shell=True).wait()
-                log_and_print_online("**[CMD Execute]**\n\n[CMD] pip install {}".format(module))
+                subprocess.Popen(f"pip install {module}", shell=True).wait()
+                log_and_print_online(f"**[CMD Execute]**\n\n[CMD] pip install {module}")
 
     def set_directory(self, directory):
         assert len(self.env_dict['directory']) == 0
@@ -67,14 +66,16 @@ class ChatEnv:
         self.manuals.directory = directory
 
         if os.path.exists(self.env_dict['directory']) and len(os.listdir(directory)) > 0:
-            new_directory = "{}.{}".format(directory, time.strftime("%Y%m%d%H%M%S", time.localtime()))
+            new_directory = (
+                f'{directory}.{time.strftime("%Y%m%d%H%M%S", time.localtime())}'
+            )
             shutil.copytree(directory, new_directory)
-            print("{} Copied to {}".format(directory, new_directory))
+            print(f"{directory} Copied to {new_directory}")
         if self.config.clear_structure:
             if os.path.exists(self.env_dict['directory']):
                 shutil.rmtree(self.env_dict['directory'])
                 os.mkdir(self.env_dict['directory'])
-                print("{} Created".format(directory))
+                print(f"{directory} Created")
             else:
                 os.mkdir(self.env_dict['directory'])
 
@@ -86,7 +87,7 @@ class ChatEnv:
 
             # check if we are on windows or linux
             if os.name == 'nt':
-                command = "cd {} && dir && python main.py".format(directory)
+                command = f"cd {directory} && dir && python main.py"
                 process = subprocess.Popen(
                     command,
                     shell=True,
@@ -95,7 +96,7 @@ class ChatEnv:
                     creationflags=subprocess.CREATE_NEW_PROCESS_GROUP
                 )
             else:
-                command = "cd {}; ls -l; python3 main.py;".format(directory)
+                command = f"cd {directory}; ls -l; python3 main.py;"
                 process = subprocess.Popen(command,
                                            shell=True,
                                            preexec_fn=os.setsid,
@@ -115,14 +116,12 @@ class ChatEnv:
 
             if return_code == 0:
                 return False, success_info
+            if error_output := process.stderr.read().decode('utf-8'):
+                if "Traceback".lower() in error_output.lower():
+                    errs = error_output.replace(f"{directory}/", "")
+                    return True, errs
             else:
-                error_output = process.stderr.read().decode('utf-8')
-                if error_output:
-                    if "Traceback".lower() in error_output.lower():
-                        errs = error_output.replace(directory + "/", "")
-                        return True, errs
-                else:
-                    return False, success_info
+                return False, success_info
         except subprocess.CalledProcessError as e:
             return True, f"Error: {e}"
         except Exception as ex:
@@ -171,19 +170,21 @@ class ChatEnv:
 
         if not os.path.exists(directory):
             os.mkdir(directory)
-            print("{} Created.".format(directory))
+            print(f"{directory} Created.")
 
         meta_filename = "meta.txt"
         with open(os.path.join(directory, meta_filename), "w", encoding="utf-8") as writer:
-            writer.write("{}:\n{}\n\n".format("Task", self.env_dict['task_prompt']))
-            writer.write("{}:\n{}\n\n".format("Config", self.config.__str__()))
-            writer.write("{}:\n{}\n\n".format("Roster", ", ".join(self.roster.agents)))
-            writer.write("{}:\n{}\n\n".format("Modality", self.env_dict['modality']))
-            writer.write("{}:\n{}\n\n".format("Ideas", self.env_dict['ideas']))
-            writer.write("{}:\n{}\n\n".format("Language", self.env_dict['language']))
-            writer.write("{}:\n{}\n\n".format("Code_Version", self.codes.version))
-            writer.write("{}:\n{}\n\n".format("Proposed_images", len(self.proposed_images.keys())))
-            writer.write("{}:\n{}\n\n".format("Incorporated_images", len(self.incorporated_images.keys())))
+            writer.write(f"Task:\n{self.env_dict['task_prompt']}\n\n")
+            writer.write(f"Config:\n{self.config.__str__()}\n\n")
+            writer.write(f'Roster:\n{", ".join(self.roster.agents)}\n\n')
+            writer.write(f"Modality:\n{self.env_dict['modality']}\n\n")
+            writer.write(f"Ideas:\n{self.env_dict['ideas']}\n\n")
+            writer.write(f"Language:\n{self.env_dict['language']}\n\n")
+            writer.write(f"Code_Version:\n{self.codes.version}\n\n")
+            writer.write(f"Proposed_images:\n{len(self.proposed_images.keys())}\n\n")
+            writer.write(
+                f"Incorporated_images:\n{len(self.incorporated_images.keys())}\n\n"
+            )
         print(os.path.join(directory, meta_filename), "Wrote")
 
     def generate_images_from_codes(self):
@@ -249,7 +250,7 @@ class ChatEnv:
                 images[filename] = desc
                 print("{}: {}".format(filename, images[filename]))
 
-        for filename in images.keys():
+        for filename in images:
             if not os.path.exists(os.path.join(self.env_dict['directory'], filename)):
                 desc = images[filename]
                 if desc.endswith(".png"):

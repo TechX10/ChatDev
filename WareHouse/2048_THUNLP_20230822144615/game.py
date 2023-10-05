@@ -10,9 +10,7 @@ class Game:
     def add_random_tile(self):
         empty_spots = []
         for row in range(10):
-            for col in range(10):
-                if self.grid[row][col] == 0:
-                    empty_spots.append((row, col))
+            empty_spots.extend((row, col) for col in range(10) if self.grid[row][col] == 0)
         if empty_spots:
             row, col = random.choice(empty_spots)
             self.grid[row][col] = random.choice([2, 4])

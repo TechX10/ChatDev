@@ -26,22 +26,18 @@ class TodoApp:
     def start(self):
         self.root.mainloop()
     def add_task(self):
-        task = self.task_var.get()
-        if task:
+        if task := self.task_var.get():
             self.tasks.append(task)
             self.task_listbox.insert(END, task)
             self.task_var.set("")
     def edit_task(self):
-        selected_index = self.task_listbox.curselection()
-        if selected_index:
+        if selected_index := self.task_listbox.curselection():
             selected_task = self.task_listbox.get(selected_index)
-            edited_task = self.task_var.get()
-            if edited_task:
+            if edited_task := self.task_var.get():
                 self.tasks[selected_index[0]] = edited_task
                 self.task_listbox.delete(selected_index)
                 self.task_listbox.insert(selected_index, edited_task)
     def delete_task(self):
-        selected_index = self.task_listbox.curselection()
-        if selected_index:
+        if selected_index := self.task_listbox.curselection():
             self.tasks.pop(selected_index[0])
             self.task_listbox.delete(selected_index)

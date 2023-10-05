@@ -51,14 +51,8 @@ class PaintApp:
         self.current_color = tk.colorchooser.askcolor()[1]
     def open_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.png;*.jpg;*.jpeg")])
-        if file_path:
-            # Logic to open and display the image
-            pass
     def save_file(self):
         file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG", "*.png")])
-        if file_path:
-            # Logic to save the canvas as an image
-            pass
     def draw(self, event):
         if self.current_tool == "pencil":
             self.canvas.create_line(event.x, event.y, event.x + 1, event.y + 1, fill=self.current_color, width=1)

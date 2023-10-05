@@ -194,11 +194,7 @@ def get_first_int(string: str) -> Optional[int]:
         int or None: The first integer number found in the string, or None if
             no integer number is found.
     """
-    match = re.search(r'\d+', string)
-    if match:
-        return int(match.group())
-    else:
-        return None
+    return int(match.group()) if (match := re.search(r'\d+', string)) else None
 
 
 def download_tasks(task: TaskType, folder_path: str) -> None:
