@@ -1,0 +1,2 @@
+python run.py --task "[description_of_your_idea]" --name "[project_name]"
+	python run.py --task "[Generate social media post pertaining to Music Producing & Creation. Post the content utilizing hashtags, emoticons, keywords and SEO." --name "Visual Symmetry Studio"
